@@ -10,9 +10,11 @@ namespace AspDotNet_MVC_Project.Models
         public int Id { get; set; }
         [Column(TypeName = "varchar(50)")]
         [Required]
+        [RegularExpression("^[\\p{L}\\s'-]+$", ErrorMessage = "Provide full name!")]
         [Display(Name = "Name")]
         public string Name { get; set; }
         [Column(TypeName = "varchar(50)")]
+        [RegularExpression("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$\r\n",ErrorMessage = "Invalid mail address!")]
         [Required]
         public string Email { get; set; }
         [Column(TypeName = "int")]

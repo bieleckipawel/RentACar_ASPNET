@@ -1,4 +1,5 @@
 ﻿using AspDotNet_MVC_Project.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,12 +24,14 @@ namespace CarRentalApp.Controllers
           return View(cars);
             
         }
+        [Authorize(Roles = "Admin")]
         public ActionResult CreateCar()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public ActionResult CreateCar(Car car)
         {
@@ -37,12 +40,14 @@ namespace CarRentalApp.Controllers
             return RedirectToAction("CarList");
 
         }
+        [Authorize(Roles = "Admin")]
         public ActionResult DeleteCar(int id)
         {
             return View(_context.Cars.FirstOrDefault(x => x.Id == id));
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteCar(int id, Car car)
         {
@@ -57,7 +62,7 @@ namespace CarRentalApp.Controllers
         {
             return View(_context.Cars.FirstOrDefault(x => x.Id == id));
         }
-
+        [Authorize(Roles = "Admin")]
         public ActionResult EditCar(int id)
         {
             return View(_context.Cars.FirstOrDefault(x => x.Id == id));
@@ -75,7 +80,7 @@ namespace CarRentalApp.Controllers
 
             return RedirectToAction("CarList");
         }
-
+        [Authorize(Roles = "Admin")]
         public IActionResult UserList()
         {
             return View(_context.Users);
