@@ -6,20 +6,28 @@ namespace AspDotNet_MVC_Project.Models
 {
     public class User: IdentityUser
     {
-        [Key]
-        public int Id { get; set; }
         [Column(TypeName = "varchar(50)")]
         [Required]
-        [RegularExpression("^[\\p{L}\\s'-]+$", ErrorMessage = "Provide full name!")]
         [Display(Name = "Name")]
         public string Name { get; set; }
-        [Column(TypeName = "varchar(50)")]
-        [RegularExpression("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$\r\n",ErrorMessage = "Invalid mail address!")]
-        [Required]
-        public string Email { get; set; }
-        [Column(TypeName = "int")]
-        public int Type { get; set; } // 2 = admin, 1 = customer
         [Column(TypeName = "bit")]
+        [Display(Name = "Is Verified?")]
         public bool IsVerified { get; set; }
+
+        [NotMapped]
+        [DataType(DataType.Password)]
+        public string Password { get; set; }
+
+        [DataType(DataType.Password)]
+        [NotMapped]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; }
     }
+    public class AdminUserConfig
+    {
+        public string Email { get; set; }
+        public string UserName { get; set; }
+        public string Password { get; set; }
+    }
+
 }

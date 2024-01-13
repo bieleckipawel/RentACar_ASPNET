@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarRentalApp.Controllers
@@ -13,8 +14,11 @@ namespace CarRentalApp.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly RentalDbContext _context;
 
-        public RentalController(RentalDbContext context){
+        public RentalController(UserManager<User> userManager, RentalDbContext context)
+        {
+            _userManager = userManager;
             _context = context;
+            // initialize other dependencies
         }
 
         public IActionResult CarList()
@@ -68,6 +72,7 @@ namespace CarRentalApp.Controllers
             return View(_context.Cars.FirstOrDefault(x => x.Id == id));
         }
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public ActionResult EditCar(int id, Car car)
         {
@@ -85,7 +90,68 @@ namespace CarRentalApp.Controllers
         {
             return View(_context.Users);
         }
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UserDetails(string id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            return View(user);
+        }
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UserEdit(string id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            return View(user);
+        }
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        //creating user broke this
+        public async Task<IActionResult> UserEdit(User user, string[] selectedRoles)
+        {
+            if (ModelState.IsValid)
+            {
+                var userToUpdate = await _userManager.FindByIdAsync(user.Id);
+                userToUpdate.Email = user.Email;
+                userToUpdate.UserName = user.Email;
+                userToUpdate.IsVerified = user.IsVerified;
+                var updateResult = await _userManager.UpdateAsync(userToUpdate);
+                var currentRoles = await _userManager.GetRolesAsync(userToUpdate);
+                var rolesToAdd = selectedRoles.Except(currentRoles).ToList();
+                var rolesToRemove = currentRoles.Except(selectedRoles).ToList();
+                if (rolesToAdd.Contains("Admin"))
+                {
+                    userToUpdate.IsVerified = true;
+                    await _userManager.UpdateAsync(userToUpdate);
+                }
+                await _userManager.AddToRolesAsync(userToUpdate, rolesToAdd);
+                await _userManager.RemoveFromRolesAsync(userToUpdate, rolesToRemove);
+                return RedirectToAction("UserList");
+            }
+            else return View(user);
+        }
 
-      
+
+        [Authorize(Roles = "Admin")]
+        public IActionResult UserCreate()
+        {
+            var user = new User();
+            return View(user);
+        }
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UserCreate(User model, string[] selectedRoles)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = new User { UserName = model.Email, Email = model.Email, Name=model.Name, IsVerified = model.IsVerified};
+                var result = await _userManager.CreateAsync(user, model.Password);
+                await _userManager.AddToRolesAsync(user, selectedRoles);
+                return RedirectToAction("UserList");
+            }
+            return View(model);
+        }
+
     }
+
 }

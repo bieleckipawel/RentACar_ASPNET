@@ -1,0 +1,44 @@
+﻿@using System.Diagnostics
+@model AspDotNet_MVC_Project.Models.User
+
+@{
+    ViewData["Title"] = "User Details";
+}
+@inject UserManager<User> UserManager
+
+<h1>User details:</h1>
+
+<hr />
+<dl class="row">
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.Name)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.Name)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.Email)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.Email)
+    </dd>
+    <dt class = "col-sm-2">
+        @Html.DisplayNameFor(model => model.IsVerified)
+    </dt>
+    <dd class = "col-sm-10">
+        @Html.DisplayFor(model => model.IsVerified)
+    </dd>
+    <dt class="col-sm-2">
+        Roles
+    </dt>
+    <dd class="col-sm-10">
+        @{
+            var roles = await UserManager.GetRolesAsync(Model);
+        }
+        @string.Join(", ", roles)
+    </dd>
+</dl>
+<div>
+    @Html.ActionLink("Edit", "UserEdit", new { id = Model }) |
+    <a asp-action="UserList">Back to List</a>
+</div>

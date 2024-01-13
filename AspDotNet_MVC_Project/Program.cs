@@ -7,9 +7,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<RentalDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("SQLiteConnection")));
 
-builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<RentalDbContext>();
+
+var adminConfig = new AdminUserConfig();
+builder.Configuration.GetSection("AdminUser").Bind(adminConfig);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -20,6 +23,7 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var dbContext = services.GetRequiredService<RentalDbContext>();
+    var userManager = services.GetRequiredService<UserManager<User>>();
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     dbContext.Database.EnsureCreated();
     string[] roleNames = { "Admin", "User" };
@@ -29,6 +33,21 @@ using (var scope = app.Services.CreateScope())
         if (!roleExist)
         {
             await roleManager.CreateAsync(new IdentityRole(roleName));
+        }
+    }
+    var adminRoleName = "Admin";
+    if (!await roleManager.RoleExistsAsync(adminRoleName))
+    {
+        await roleManager.CreateAsync(new IdentityRole(adminRoleName));
+    }
+    var adminUser = await userManager.FindByEmailAsync(adminConfig.Email);
+    if (adminUser == null)
+    {
+        adminUser = new User { UserName = adminConfig.Email, Email = adminConfig.Email, Name=adminConfig.UserName, IsVerified = true};
+        var createUserResult = await userManager.CreateAsync(adminUser, adminConfig.Password);
+        if (createUserResult.Succeeded)
+        {
+            await userManager.AddToRoleAsync(adminUser, adminRoleName);
         }
     }
 }
