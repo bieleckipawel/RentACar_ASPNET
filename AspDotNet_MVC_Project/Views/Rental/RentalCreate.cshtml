@@ -1,0 +1,65 @@
+﻿@model AspDotNet_MVC_Project.Models.Rental
+@inject UserManager<User> UserManager
+
+@{
+    ViewData["Title"] = "Rental";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Add rental</h1>
+
+<h4>Rental</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="View">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label class="control-label">Car</label>
+                <select asp-for="CarId" class="form-control" asp-items="ViewBag.CarId"></select>
+            </div>
+            <div class="form-group">
+                @{
+                    var currentUserId = UserManager.GetUserId(User);
+                    if (User.IsInRole("Admin"))
+                    {
+                        <label class="control-label">Customer</label>
+                        <select asp-for="CustomerId" class="form-control" asp-items="ViewBag.CustomerId"></select>
+                    }
+                    else
+                    {
+                        <label class="control-label">Customer</label>
+                        <input type="hidden" asp-for="CustomerId" value="@currentUserId" />
+                        <label class="control-label">Customer: @User.Identity.Name</label>
+                    }
+                }
+            </div>
+            <div class="form-group">
+                <label asp-for="RentalDate" class="control-label"></label>
+                <input asp-for="RentalDate" class="form-control" />
+                <span asp-validation-for="RentalDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ReturnDate" class="control-label"></label>
+                <input asp-for="ReturnDate" class="form-control" />
+                <span asp-validation-for="ReturnDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div>
+    <a asp-action="RentalList">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

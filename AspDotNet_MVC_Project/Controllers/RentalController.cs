@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace CarRentalApp.Controllers
 {
@@ -18,7 +20,6 @@ namespace CarRentalApp.Controllers
         {
             _userManager = userManager;
             _context = context;
-            // initialize other dependencies
         }
 
         public IActionResult CarList()
@@ -151,7 +152,34 @@ namespace CarRentalApp.Controllers
             }
             return View(model);
         }
+        public async Task<IActionResult> RentalList()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (User.IsInRole("Admin"))
+            {
+                var rentals = _context.Rentals.ToList();
+                return View(rentals);
+            }
+            else
+            {
+                var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var rentals = _context.Rentals.Where(r => r.CustomerId == currentUserId.ToString()).ToList();
+                rentals = _context.Rentals.Include(r => r.Customer).ToList();
+                return View(rentals);
+            }
+        }
 
+        public async Task<IActionResult> RentalCreate()
+        {
+            var currentUserName = User.Identity.Name;
+            var isAdmin = User.IsInRole("Admin");
+            if (isAdmin)
+            {
+                var usersWithUserRole = await _userManager.GetUsersInRoleAsync("User"); 
+                ViewBag.CustomerId = new SelectList(usersWithUserRole, "Id", "Name");
+            }
+
+            return View();
+        }
     }
-
 }
