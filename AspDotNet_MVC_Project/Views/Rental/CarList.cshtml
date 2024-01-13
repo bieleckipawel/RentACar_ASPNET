@@ -1,0 +1,70 @@
+﻿@model IEnumerable<AspDotNet_MVC_Project.Models.Car>
+
+@{
+    ViewData["Title"] = "Cars";
+}
+
+<h1>Cars</h1>
+
+<p>
+    <a asp-action="CreateCar">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                ID
+            </th>
+            <th>
+                Make
+            </th>
+            <th>
+                Model
+            </th>
+            <th>
+                Mf. year
+            </th>
+            <th>
+                Price per day
+            </th>
+            <th>
+                Availability
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Make)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Model)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MfYear)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Available)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "EditCar", new {  id=item.Id  }) |
+                @Html.ActionLink("Details", "DetailsCar", new {  id=item.Id  }) |
+                @Html.ActionLink("Delete", "DeleteCar", new {  id=item.Id  }) 
+                @if (item.Available)
+                {
+                    <span>|</span>
+                    @Html.ActionLink("Rent", "CreateRental", new { id = item.Id });
+                }
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -6,4 +6,34 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Remove="Views\Rental\Component.razor" />
+    <Content Remove="Views\Rental\CreateCustomer.cshtml" />
+    <Content Remove="Views\Rental\CreateRental.cshtml" />
+    <Content Remove="Views\Rental\Customers.cshtml" />
+    <Content Remove="Views\Rental\DeleteCustomer.cshtml" />
+    <Content Remove="Views\Rental\DeleteRental.cshtml" />
+    <Content Remove="Views\Rental\DetailsCustomer.cshtml" />
+    <Content Remove="Views\Rental\DetailsRental.cshtml" />
+    <Content Remove="Views\Rental\EditCustomer.cshtml" />
+    <Content Remove="Views\Rental\Rentals.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.23" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.23" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.14">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.23" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.23">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.16" />
+  </ItemGroup>
+
 </Project>

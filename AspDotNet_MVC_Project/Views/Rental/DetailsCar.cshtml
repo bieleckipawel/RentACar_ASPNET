@@ -1,0 +1,54 @@
+﻿@model AspDotNet_MVC_Project.Models.Car
+
+@{
+    ViewData["Title"] = "DetailsCar";
+}
+
+<h1>Details - Car</h1>
+
+<div>
+    <h4>Car</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Make)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Make)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Model)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Model)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.MfYear)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.MfYear)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Price)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Available)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Available)
+        </dd>
+    </dl>
+</div>
+<div>
+@*     @Html.ActionLink("Edit", "EditCar", new {  id = Model.Id }) |
+ *@    <a asp-action="CarList">Back to List</a>
+</div>
