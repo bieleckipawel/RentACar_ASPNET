@@ -29,9 +29,6 @@
             <th>
                 Price per day
             </th>
-            <th>
-                Availability
-            </th>
             <th></th>
         </tr>
     </thead>
@@ -51,19 +48,18 @@
                 @Html.DisplayFor(modelItem => item.MfYear)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Price)
+                @Html.DisplayFor(modelItem => item.Price) USD
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Available)
-            </td>
-            <td>
-                @if(User.IsInRole("Admin"))
-                @Html.ActionLink("Edit", "EditCar", new { id = item.Id }) |
-                @Html.ActionLink("Details", "DetailsCar", new { id = item.Id }) |
-                @Html.ActionLink("Delete", "DeleteCar", new { id = item.Id })
+                @if (User.IsInRole("Admin"))
+                {
+                    @Html.ActionLink("Edit", "EditCar", new { id = item.Id }) <span> | </span>
+                        @Html.ActionLink("Details", "DetailsCar", new { id = item.Id }) <span> | </span>
+                    @Html.ActionLink("Delete", "DeleteCar", new { id = item.Id })
+                }
                 @if (item.Available)
                 {
-                    <span>|</span>
+                    <span></span>
                     @Html.ActionLink("Rent", "RentalCreate", new { id = item.Id })
                     ;
                 }

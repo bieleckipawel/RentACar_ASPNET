@@ -21,7 +21,7 @@ namespace CarRentalApp.Controllers
             _userManager = userManager;
             _context = context;
         }
-
+        [Authorize(Roles = "Admin, User")]
         public IActionResult CarList()
         {
 
