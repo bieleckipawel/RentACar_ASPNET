@@ -64,7 +64,7 @@
                 @if (item.Available)
                 {
                     <span>|</span>
-                    @Html.ActionLink("Rent", "CreateRental", new { id = item.Id })
+                    @Html.ActionLink("Rent", "RentalCreate", new { id = item.Id })
                     ;
                 }
             </td>

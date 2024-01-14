@@ -154,32 +154,117 @@ namespace CarRentalApp.Controllers
         }
         public async Task<IActionResult> RentalList()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (User.IsInRole("Admin"))
+            IQueryable<Rental> query = _context.Rentals.Include(r => r.Car).Include(r => r.Customer);
+
+            if (!User.IsInRole("Admin"))
             {
-                var rentals = _context.Rentals.ToList();
-                return View(rentals);
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                query = query.Where(r => r.CustomerId == currentUserId);
             }
-            else
-            {
-                var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                var rentals = _context.Rentals.Where(r => r.CustomerId == currentUserId.ToString()).ToList();
-                rentals = _context.Rentals.Include(r => r.Customer).ToList();
-                return View(rentals);
-            }
+
+            var rentals = await query.ToListAsync();
+            return View(rentals);
         }
 
         public async Task<IActionResult> RentalCreate()
         {
-            var currentUserName = User.Identity.Name;
-            var isAdmin = User.IsInRole("Admin");
-            if (isAdmin)
+            var cars = _context.Cars.Select(c => new SelectListItem
             {
-                var usersWithUserRole = await _userManager.GetUsersInRoleAsync("User"); 
-                ViewBag.CustomerId = new SelectList(usersWithUserRole, "Id", "Name");
+                Value = c.Id.ToString(),
+                Text = $"{c.Make} {c.Model}"
+            }).ToList();
+
+            ViewBag.CarId = new SelectList(cars, "Value", "Text");
+
+            if (User.IsInRole("Admin"))
+            {
+                var customers = await _userManager.Users.Select(u => new SelectListItem
+                {
+                    Value = u.Id,
+                    Text = u.Name
+                }).ToListAsync();
+
+                ViewBag.CustomerId = new SelectList(customers, "Value", "Text");
             }
 
+            return View(new Rental());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RentalCreate(Rental rental)
+        {
+            ModelState.Remove("Car");
+            ModelState.Remove("Customer");
+            if (rental.ReturnDate <= rental.RentalDate)
+            {
+                ModelState.AddModelError("ReturnDate", "Return Date must be greater than Rental Date.");
+            }
+            bool isCarAlreadyRented = await _context.Rentals.AnyAsync(r =>
+                r.CarId == rental.CarId &&
+                rental.RentalDate < r.ReturnDate &&
+                rental.ReturnDate > r.RentalDate);
+            if (isCarAlreadyRented)
+            {
+                ModelState.AddModelError("CarId", "This car is already rented during the selected period.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                var car = await _context.Cars.FindAsync(rental.CarId);
+                var user = await _userManager.FindByIdAsync(rental.CustomerId);
+                if (!user.IsVerified)
+                {
+                    TempData["RentalMessage"] = "Rent is successful, but you will need to confirm your data.";
+                }
+                else
+                {
+                    TempData["RentalMessage"] = "Thank you for your rent.";
+                }
+                var rentalDays = (rental.ReturnDate - rental.RentalDate).Days;
+                rental.TotalPrice = rentalDays * car.Price;
+                _context.Add(rental);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(RentalList));
+            }
+            var cars = _context.Cars.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = $"{c.Make} {c.Model}"
+            }).ToList();
+
+            ViewBag.CarId = new SelectList(cars, "Value", "Text");
+
+            if (User.IsInRole("Admin"))
+            {
+                var customers = await _userManager.Users.Select(u => new SelectListItem
+                {
+                    Value = u.Id,
+                    Text = u.Name
+                }).ToListAsync();
+
+                ViewBag.CustomerId = new SelectList(customers, "Value", "Text");
+            }
             return View();
         }
+        public async Task<IActionResult> RentalDelete(int id)
+        {
+            var rental = await _context.Rentals
+                .Include(r => r.Car)
+                .Include(r => r.Customer)
+                .FirstOrDefaultAsync(r => r.Id == id);
+            return View(rental);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RentalDeleteConfirm(int id)
+        {
+            var rental = await _context.Rentals.FindAsync(id);
+            _context.Rentals.Remove(rental); 
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(RentalList));
+        }
+
+
     }
 }

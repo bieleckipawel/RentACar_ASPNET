@@ -4,7 +4,14 @@
     ViewData["Title"] = "Rentals";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+@{
+    if (TempData["RentalMessage"] != null)
+    {
+        <div class="alert alert-info">
+            @TempData["RentalMessage"]
+        </div>
+    }
+}
 <h1>Rental list</h1>
 
 <p>
@@ -52,13 +59,7 @@
             <td>
                 @if (User.IsInRole("Admin"))
                 {
-                    <a asp-action="RentalEdit" asp-route-id="@item.Id">Edit</a>
-                    <a asp-action="RentalDetails" asp-route-id="@item.Id">Details</a>
                     <a asp-action="RentalDelete" asp-route-id="@item.Id">Delete</a>
-                }
-                else
-                {
-                    <a asp-action="RentalDetails" asp-route-id="@item.Id">Details</a>
                 }
             </td>
         </tr>

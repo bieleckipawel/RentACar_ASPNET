@@ -8,28 +8,24 @@ namespace AspDotNet_MVC_Project.Models
         [Key]
         public int Id { get; set; }
         [Required]
-        [Column(TypeName = "int")]
-        public int CarId { get; set; }
-        [Required]
-        [Column(TypeName = "string")]
-        public string CustomerId { get; set; }
-        [Required]
         [Column(TypeName = "datetime")]
         [Display(Name = "Rental Date")]
         public DateTime RentalDate { get; set; }
         [Required]
         [Column(TypeName = "datetime")]
         [Display(Name = "Return Date")]
-        [Compare("RentalDate", ErrorMessage = "Return Date must be greater than Rental Date")]
         public DateTime ReturnDate { get; set; }
         [Display(Name = "Total Price")]
         [Column(TypeName = "int")]
         public int TotalPrice { get; set; }
-        [ForeignKey("CustomerId")]
+        [ForeignKey("Customer")]
         [Display(Name = "Customer")]
+        public string CustomerId { get; set; }
         public User Customer { get; set; }
-        [ForeignKey("CarId")]
+        [ForeignKey("Car")]
         [Display(Name = "Car")]
+        public int CarId { get; set; }
         public Car Car { get; set; }
+
     }
 }
