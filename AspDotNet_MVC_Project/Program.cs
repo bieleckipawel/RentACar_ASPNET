@@ -2,6 +2,7 @@ using AspDotNet_MVC_Project.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Configuration;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<RentalDbContext>(options =>
@@ -13,8 +14,6 @@ builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfi
 
 var adminConfig = new AdminUserConfig();
 builder.Configuration.GetSection("AdminUser").Bind(adminConfig);
-
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -60,12 +59,16 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "")),
+    RequestPath = ""
+});
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapRazorPages();
